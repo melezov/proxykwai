@@ -3,7 +3,11 @@ package test
 
 import org.scalatest._
 
-object ProxyKwaiFeatureSpec extends FeatureSpec {
+import org.junit.runner.RunWith
+import org.scalatest.junit.JUnitRunner
+
+@RunWith(classOf[JUnitRunner])
+class ProxyKwaiFeatureSpec extends FeatureSpec {
 
   object TestParserPrimitives {
     def parseBoolean(s: String) = s.toBoolean
@@ -75,11 +79,13 @@ object ProxyKwaiFeatureSpec extends FeatureSpec {
   feature("Overloading via return types on scala singletons") {
 
     scenario("Multiple singleton objects") {
-      testParserProxyCompiler.export("target/classes")
+      testParserProxyCompiler.export("target/test-classes")
 
-      info(TestParser.parse("1234567"): Array[Char])
-      info(TestParser.parse("1234567"): Array[Char])
-      info(TestParser.parse("1234567"): Array[Int])
+/*
+      info(TestParserProxy.parse("true"): Boolean)
+      info(TestParserProxy.parse("123456"): Array[Char])
+      info(TestParserProxy.parse("true"): Array[Int])
+*/
     }
   }
 }

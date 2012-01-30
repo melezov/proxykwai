@@ -8,9 +8,9 @@ import java.lang.reflect.Method;
 import jasmin.ClassFile;
 
 public class ProxyKwai {
-  final String targetClass;
-  final String targetMethod;
-  final Class<?>[] arguments;
+  private final String targetClass;
+  private final String targetMethod;
+  private final Class<?>[] arguments;
 
   public ProxyKwai(
       final String targetClass,
@@ -26,7 +26,7 @@ public class ProxyKwai {
 
   final ProxyCall[] calls;
 
-  ProxyKwai(
+  private ProxyKwai(
       final String targetClass,
       final String targetMethod,
       final Class<?>[] arguments,
@@ -110,7 +110,8 @@ public class ProxyKwai {
           "    getstatic %1$s/MODULE$ L%1$s;\n",
           slashify(call.sourceClass)
         ).format(
-          "    aload_0\n"
+          "%s",
+          getArgumentLoader(arguments)
         ).format(
           "    invokevirtual %s/%s(%s)%s\n",
           slashify(call.sourceClass),
@@ -126,8 +127,27 @@ public class ProxyKwai {
     }
 
     System.out.println(formatter);
-
     return formatter.toString();
+  }
+
+  private static String getArgumentLoader(final Class<?>[] arguments) {
+    final StringBuilder sB = new StringBuilder();
+
+    for (int index = 0; index < arguments.length; index ++) {
+      final String quickDirtyHack =
+        getReturnType(arguments[index]);
+
+      // quick and dirty hack will not work for indexes > 3
+      // and god knows how many other cases...
+
+      sB.append("    ")
+        .append(quickDirtyHack)
+        .append("load_")
+        .append(index)
+        .append('\n');
+    }
+
+    return sB.toString();
   }
 
   public void export(final String classPath) {
@@ -157,7 +177,7 @@ public class ProxyKwai {
     }
   }
 
-  static byte[] assemble(final String body) throws Exception {
+  private static byte[] assemble(final String body) throws Exception {
     final ClassFile classFile = new ClassFile();
     final BufferedReader bR =
       new BufferedReader(new StringReader(body));
